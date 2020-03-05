@@ -23,6 +23,7 @@
 
   <!-- Theme CSS - Includes Bootstrap -->
   <link href="css/creative.min.css" rel="stylesheet">
+  <link href="css/animate.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
 
 </head>
@@ -93,7 +94,7 @@
   </section>
 
   <!-- Modal add Photo -->
-  <form method="POST" action='/uploadfile' enctype="multipart/form-data">
+  <form method="POST" action='photos/uploadSinglePhoto' enctype="multipart/form-data" id='uploadPhotoForm'>
     <div class="modal fade  bd-example-modal-lg" id="exampleModalCenter" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -109,7 +110,7 @@
               <div class="col-md-6 ml-auto">
                 <div class="input-group">
                   <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile04" name="image">
+                    <input type="file" class="custom-file-input" id="image" name="image">
                     <label class="custom-file-label" id="nameLabel" for="inputGroupFile04">Choose file</label>
                   </div>
                 </div>
@@ -118,23 +119,26 @@
 
               <div class="col-md-6 ml-auto">
                 <div class="input-group mb-3">
-                  <input type="text" class="form-control" placeholder="ex: sufragerie" aria-label="Metadata"
-                    aria-describedby="basic-addon2">
+                  <input type="text" class="form-control" id="inputNewMetadata" placeholder="ex: sufragerie"
+                    aria-label="Metadata" aria-describedby="basic-addon2">
                   <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">Add</button>
+                    <button class="btn btn-outline-secondary" type="button" id="addNewMetadata">Add</button>
                   </div>
                 </div>
                 <div class="input-group">
-                  <select class="custom-select" id="inputGroupSelect04">
+                  <select class="custom-select" id="allOldMetadata">
                     <option selected>Metadate adaugate</option>
                     <option value="1">Baia Mare</option>
                     <option value="2">Scaun</option>
                     <option value="3">Pal</option>
                   </select>
                   <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">Add</button>
+                    <button class="btn btn-outline-secondary" type="button" id='addOldMetadata'>Add</button>
                   </div>
                 </div>
+                  <div class="append-metadata">
+
+                  </div>
               </div>
             </div>
           </div>
@@ -146,7 +150,7 @@
       </div>
     </div>
   </form>
- 
+
   <!-- Footer -->
   <footer class="bg-light py-5">
     <div class="container">
@@ -165,6 +169,7 @@
   <!-- Custom scripts for this template -->
   <script src="js/creative.min.js"></script>
   <script src="js/exif.js"></script>
+  <script src="js/bootstrap-notify.min.js"></script>
   <script src="js/script.js"></script>
 
 </body>
