@@ -10,6 +10,13 @@ git clone https://github.com/vanceacorina97/WubbioLearn.git
 ```bash
 npm install
 ```
+
+### Usage
+- Create a folder in api directory to store images
+```bash
+cd api
+mkdir uploads
+```
 ### Start the app
 
 ```bash
