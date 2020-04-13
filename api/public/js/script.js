@@ -1,12 +1,36 @@
 var tabNewMetadata;
-
 $(function () {
-    if ($("#gallery").find(".col-lg-4.col-sm-6").length > 0) {
-        console.log('da');
-    } else {
-        $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
-    }
+    $.ajax({
+        type: "GET",
+        url: "/photos/allPhotos",
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            if (data.length >= 1) {
+                for (let i = 0; i < data.length; i++) {
+                    $.get(data[i].path)
+                        .done(function () {
+                            $('#gallery').append("<div class='col-lg-4 col-sm-6'>\
+                            <a class='portfolio-box' href='"+ data[i].path + "'><img class='img-fluid' src='" + data[i].path + "' alt=''>\
+                                <div class='portfolio-box-caption'>\
+                                    <div class='project-category text-white-50'>Category</div>\
+                                    <div class='project-name'>Project Name</div>\
+                                </div></a>\
+                        </div>")
 
+                        }).fail(function () {
+                            // not exists code
+                        })
+                }
+            } else {
+                $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
+            }
+        },
+        error: function (request, status, error) {
+            notificare(3, " Upload photo", "Conexiune esuata!");
+            $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
+        }
+    });
 });
 
 $("#modalAddPhoto").on("click", function () {
@@ -17,6 +41,29 @@ $("#addImagePrev").on("click", function () {
     console.log($("#inputGroupFile04").val());
 
 });
+$("#formSeachPhoto").submit(function (e) {
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+    var metadataWord = $('#searchWord').val();
+    var form = $(this);
+    var url = form.attr('action');
+    var formData = new FormData(this);
+    formData.append("searchWord", JSON.stringify(metadataWord));
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                notificare(1, " Upload photo", data.searchWord);
+            },
+            error: function (request, status, error) {
+                notificare(3, " Upload photo", request.responseJSON.error);
+            }
+        });
+});
+
 
 $("#image").change(function () {
     var name = $('#image').val().split('\\').pop();
@@ -87,7 +134,7 @@ $("#uploadPhotoForm").submit(function (e) {
     var form = $(this);
     var url = form.attr('action');
     var formData = new FormData(this);
-    formData.append("metadate", tabNewMetadata);
+    formData.append("metadate", JSON.stringify(tabNewMetadata));
     console.log(tabNewMetadata);
     var imageExist = checkUpload();
     if (imageExist) {
@@ -100,17 +147,35 @@ $("#uploadPhotoForm").submit(function (e) {
             success: function (data) {
                 notificare(1, " Upload photo", data.message);
                 $('#exampleModalCenter').modal('hide');
+                afisarePoza(data.path);
             },
             error: function (request, status, error) {
                 notificare(3, " Upload photo", request.responseJSON.error);
             }
         });
-    }else{
+    } else {
         notificare(3, " Upload photo", "Please upload a file!");
     }
 
+});
 
-
+$('#formNeo4j').submit(function () {
+    var form = $(this);
+    var url = form.attr('action');
+    $.ajax({
+        type: "POST",
+        url: url,
+        async: true,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            console.log(data.path);
+            notificare(1, "Neo4j", data.message);
+        },
+        error: function (request, status, error) {
+            notificare(3, "Neo4j", request.responseJSON.message);
+        }
+    });
 });
 
 function checkUpload() {
@@ -118,7 +183,15 @@ function checkUpload() {
         return false;
     return true;
 }
-
+function afisarePoza(path) {
+    $("<div class='col-lg-4 col-sm-6'>\
+    <a class='portfolio-box' href='"+ path + "'><img class='img-fluid' src='" + path + "' alt=''>\
+        <div class='portfolio-box-caption'>\
+            <div class='project-category text-white-50'>Category</div>\
+            <div class='project-name'>Project Name</div>\
+        </div></a>\
+</div>").hide().prependTo('#gallery').fadeIn("slow");
+}
 function notificare(tip, titlu, mesaj) {
     var iconn;
     if (tip == 1) {
