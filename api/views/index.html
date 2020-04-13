@@ -83,7 +83,15 @@
       </div>
     </div>
   </section>
-
+  <!-- Section Search -->
+  <section id='search'>
+    <div style="padding:20px;" class="row justify-content-center">
+      <form class="form-inline" id='formSeachPhoto' method="POST" action='photos/searchedMetadata'>
+        <input class="form-control mr-sm-2" type="search" placeholder="ex: mare..." aria-label="Search" id="searchWord" name="searchWord">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit" id="searchPhotos">Search</button>
+      </form>
+    </div>
+  </section>
   <!-- Portfolio Section -->
   <section id="portfolio">
     <div class="container-fluid p-0">
@@ -136,9 +144,9 @@
                     <button class="btn btn-outline-secondary" type="button" id='addOldMetadata'>Add</button>
                   </div>
                 </div>
-                  <div class="append-metadata">
+                <div class="append-metadata">
 
-                  </div>
+                </div>
               </div>
             </div>
           </div>
