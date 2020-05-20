@@ -20,3 +20,17 @@
     font-size: 13px;
     margin: 2px;
 }
+
+.loginDiv{
+    width: 20%;
+    padding: 36px;
+    border-radius: 43px;
+    text-align: center;
+    background-color: cornsilk;
+    border-color: burlywood;
+    position: absolute;
+    top: 35%;
+    left: 43%;
+    margin-top: -50px;
+    margin-left: -50px;
+}

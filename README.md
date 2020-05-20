@@ -12,14 +12,23 @@ npm install
 ```
 
 ### Usage
-- Create a folder in api directory to store images
+- Create a folder in api/public directory to store images
 ```bash
 cd api
+cd public
 mkdir uploads
 ```
-### Start the app
+### Start backend
 
 ```bash
 npm start
 ```
 In your browser, navigate to http://localhost:3000
+
+### Start frontend
+
+```bash
+npm run dev
+```
+In your browser, navigate to http://localhost:5010
+
