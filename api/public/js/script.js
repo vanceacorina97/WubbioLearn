@@ -1,37 +1,37 @@
 var tabNewMetadata;
-$(function () {
-    $.ajax({
-        type: "GET",
-        url: "/photos/allPhotos",
-        processData: false,
-        contentType: false,
-        success: function (data) {
-            if (data.length >= 1) {
-                for (let i = 0; i < data.length; i++) {
-                    $.get(data[i].path)
-                        .done(function () {
-                            $('#gallery').append("<div class='col-lg-4 col-sm-6'>\
-                            <a class='portfolio-box' href='"+ data[i].path + "'><img class='img-fluid' src='" + data[i].path + "' alt=''>\
-                                <div class='portfolio-box-caption'>\
-                                    <div class='project-category text-white-50'>Category</div>\
-                                    <div class='project-name'>Project Name</div>\
-                                </div></a>\
-                        </div>")
+// $(function () {
+//     $.ajax({
+//         type: "GET",
+//         url: "/photos/allPhotos",
+//         processData: false,
+//         contentType: false,
+//         success: function (data) {
+//             if (data.length >= 1) {
+//                 for (let i = 0; i < data.length; i++) {
+//                     $.get(data[i].path)
+//                         .done(function () {
+//                             $('#gallery').append("<div class='col-lg-4 col-sm-6'>\
+//                             <a class='portfolio-box' href='"+ data[i].path + "'><img class='img-fluid' src='" + data[i].path + "' alt=''>\
+//                                 <div class='portfolio-box-caption'>\
+//                                     <div class='project-category text-white-50'>Category</div>\
+//                                     <div class='project-name'>Project Name</div>\
+//                                 </div></a>\
+//                         </div>")
 
-                        }).fail(function () {
-                            // not exists code
-                        })
-                }
-            } else {
-                $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
-            }
-        },
-        error: function (request, status, error) {
-            notificare(3, " Upload photo", "Conexiune esuata!");
-            $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
-        }
-    });
-});
+//                         }).fail(function () {
+//                             // not exists code
+//                         })
+//                 }
+//             } else {
+//                 $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
+//             }
+//         },
+//         error: function (request, status, error) {
+//             notificare(3, " Upload photo", "Conexiune esuata!");
+//             $("#gallery").append("<div class='col-lg-12 text-center'><p class='text-black-50 mb-4' style='margin-top:20px'>Nu exista poze in galerie...</p></div>")
+//         }
+//     });
+// });
 
 $("#modalAddPhoto").on("click", function () {
     $('#exampleModalCenter').modal('show');
