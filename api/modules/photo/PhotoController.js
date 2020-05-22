@@ -32,7 +32,7 @@ const upload = multer({
 class PhotoController {
 
     async getAllPhotos(req, res) {
-        const search = req.body.search;
+        const search = req.query.search;
         const photos = await PhotoService.getAllPhotos(search);
         return res.send(photos);
     }

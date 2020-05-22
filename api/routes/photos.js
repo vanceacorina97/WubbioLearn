@@ -13,7 +13,7 @@ router.get('/', function (req, res, next) {
 });
 
 
-router.get('/allPhotos', LoginController.authenticate, (req, res, next) => {
+router.get('/allPhotos', (req, res, next) => {
     const photoController = new PhotoController();
     photoController.getAllPhotos(req, res);
 });

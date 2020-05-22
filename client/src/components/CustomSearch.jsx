@@ -1,7 +1,10 @@
 import React from 'react';
+import { useState, useContext } from 'react';
 import { fade, makeStyles, useTheme } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
+import PhotoService from '../modules/photos/PhotoService';
+import { store } from '../store/store';
 
 const useStyles = makeStyles((theme) => ({
     search: {
@@ -34,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
     },
     inputInput: {
         padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
         transition: theme.transitions.create('width'),
         width: '100%',
@@ -47,13 +49,49 @@ const useStyles = makeStyles((theme) => ({
 const CustomSearch = () => {
     const classes = useStyles();
     const theme = useTheme();
-    //aici trebuie cu useEfect.
+
+    const [inputSearch, setInputSerach] = useState('');
+    const [search, setSerach] = useState('');
+
+    const globalState = useContext(store);
+    const { dispatch } = globalState;
+
+    const getSearchPhoto = async (value) => {
+        try {
+            dispatch({ type: 'photos-list-start' });
+            console.log('search din customsearch', value)
+            const response = await PhotoService.getAllPhotos({ search: value });
+            dispatch({ type: 'photos-list-success', payload: response });
+            console.log('ajunge dupa dispatch success');
+        } catch (err) {
+            console.log('ajunge dupa dispatch err');
+            dispatch({ type: 'photos-list-error', payload: err });
+        }
+
+    }
+
+    const handleInputSearchChange = (ev) => {
+        setInputSerach(ev.target.value);
+    }
+
+    const handleOnEnter = () => {
+        setSerach(search);
+        getSearchPhoto(inputSearch);
+    }
+
     return (
         <div className={classes.search}>
             <div className={classes.searchIcon}>
                 <SearchIcon />
             </div>
             <InputBase
+                value={inputSearch}
+                onChange={handleInputSearchChange}
+                onKeyUp={(event) => {
+                    if (event.keyCode == 13) {
+                        handleOnEnter();
+                    }
+                }}
                 placeholder="Search…"
                 classes={{
                     root: classes.inputRoot,

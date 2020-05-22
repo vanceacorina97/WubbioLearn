@@ -14,7 +14,7 @@ const StateProvider = ({ children }) => {
 
     const storePathKeys = type.split('-');
 
-    const status = storePathKeys[2]; // start, success, error
+    const status = storePathKeys.pop(); // start, success, error
 
     const storePath = storePathKeys.join('.');
     const nextState = { ...currentState };

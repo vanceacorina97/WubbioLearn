@@ -1,20 +1,13 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import PhotoService from './PhotoService';
 import PhotoGateway from './PhotoGateway'
 import Gallery from 'react-grid-gallery';
-import DeleteIcon from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton'
-import EditIcon from '@material-ui/icons/Edit';
 
 const gateway = new PhotoGateway();
 
-export const PhotoComponent = (props) => {
-  const [list, setList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  // const [inputSearch, setList] = useState([]);
-  // const [search, setList] = useState([]);
+export const PhotoComponent = ({ dispatch, isFetching, isError, list }) => {
+
   const handleSetImages = (list) => {
     const images = new Array();
     list.forEach((photo) => images.push({
@@ -28,24 +21,23 @@ export const PhotoComponent = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      setIsError(false);
       try {
-        const response = await PhotoService.getAllPhotos(); //va fi search {search} -> asta inseamna search:search label:value search din useState
-        setIsLoading(false);
-        setList(response)
+        dispatch({ type: 'photos-list-start' });
+        const response = await PhotoService.getAllPhotos();
+        dispatch({ type: 'photos-list-success', payload: response });
       } catch (err) {
-        setIsError(true);
+        dispatch({ type: 'photos-list-error', payload: err });
       }
     }
     fetchData();
   }, []);
   return (
-    isLoading ?
+    isFetching ?
       <div>Loading...</div> :
-      <Gallery images={handleSetImages(list)} backdropClosesModal={true} rowHeight={250} customControls={[
-        <IconButton> <DeleteIcon color="primary" /></IconButton>,
-        <IconButton><EditIcon color="primary" /></IconButton>
-      ]} />
+      <Gallery images={handleSetImages(list)} backdropClosesModal={true} rowHeight={250} />
+    //customControls={[
+    //<IconButton> <DeleteIcon color="primary" /></IconButton>,
+    //<IconButton><EditIcon color="primary" /></IconButton>
+    //]}
   )
 }
