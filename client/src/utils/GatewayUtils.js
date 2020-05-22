@@ -42,6 +42,8 @@ export default class Gateway {
 
     getRequest(url, data) {
         const options = this.getRequestOptions(GET_METHOD, url, data);
+        console.log('options', options)
+
 
         return this.client(options)
             .then(this.onSuccess)
@@ -61,7 +63,7 @@ export default class Gateway {
 
         options.method = method;
         options.url = `${endpoint}`;
-        options.data = data;
+        options.params = data; //  options.data = data;
 
         return options;
     }

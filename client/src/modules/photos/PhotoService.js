@@ -6,10 +6,9 @@ class PhotoService {
 
     }
 
-    getAllPhotos() { //data? - inseamna optional la toate la fel
-        return this.gateway.getAllPhotos() //data 
+    getAllPhotos(data = "") {
+        return this.gateway.getAllPhotos(data)
             .then((response) => {
-                // console.log('------------ ', response);
                 return response.data;
             }).catch((err) => Promise.reject(err))
     }
