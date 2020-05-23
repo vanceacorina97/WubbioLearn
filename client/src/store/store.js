@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createContext, useReducer } from 'react';
 import { set } from 'lodash';
+import * as constants from './constants';
 
 const INITIAL_STATE = {};
 
@@ -19,21 +20,21 @@ const StateProvider = ({ children }) => {
     const storePath = storePathKeys.join('.');
     const nextState = { ...currentState };
 
-    if (status === 'start') {
-      return set(nextState, storePath, { status: 'running' });
+    if (status === constants.STATUS_START) {
+      return set(nextState, storePath, { status: constants.ACTION_STATUS_RUNNING });
     }
 
-    if (status === 'success') {
+    if (status === constants.STATUS_SUCCESS) {
       return set(nextState, storePath, {
-        status: 'done',
+        status: constants.ACTION_STATUS_DONE,
         data: payload,
         error: undefined,
       });
     }
 
-    if (status === 'error') {
+    if (status === constants.STATUS_ERROR) {
       return set(nextState, storePath, {
-        status: 'failed',
+        status: constants.ACTION_STATUS_FAILED,
         data: undefined,
         error: payload,
       });
