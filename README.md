@@ -5,12 +5,18 @@
 ```git
 git clone https://github.com/vanceacorina97/WubbioLearn.git
 ```
+#### backend
 - Move to the /api folder
 - Install dependecies
 ```bash
 npm install
 ```
-
+#### frontend
+- Move to the /client folder
+- Install dependecies
+```bash
+npm install
+```
 ### Usage
 - Create a folder in api/public directory to store images
 ```bash
