@@ -17,7 +17,7 @@ router.get('/allProjects', LoginController.authenticate, function (req, res) {
 
 router.post('/createProject',
   LoginController.authenticate,
-  upload.array('images', 5),
+  upload.array('images', 10),
   projectController.createProject,
   photoController.uploadPhotos);
 

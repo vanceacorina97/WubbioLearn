@@ -99,13 +99,15 @@ const RegisterPage = ({ register }) => {
     const [passwordError, setPasswordError] = React.useState(false);
     const [emailMessageError, setEmailMessageError] = React.useState('');
     const [passMessageError, setPassMessageError] = React.useState('');
-    const [registerInfo, setRegisterInfo] = React.useState(true);
-    const [registerInfoMessage, setRegisterInfoMessage] = React.useState('da');
+    const [registerInfo, setRegisterInfo] = React.useState(false);
+    const [registerInfoMessage, setRegisterInfoMessage] = React.useState('');
 
     const goBack = () => {
         history.push('/');
     }
     const handleChange = (prop) => (event) => {
+        setRegisterInfo(false);
+        setRegisterInfoMessage('');
         if (prop === 'email') {
             setEmailError(false);
         }

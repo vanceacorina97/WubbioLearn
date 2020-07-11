@@ -220,7 +220,7 @@ export const FormComponent = ({ dispatch, isMetadataFetching, isMetadataError, m
                                 className={classes.inputAutoComplete}
                                 value={location}
                                 onChange={handleAutoCompleteChange('location')}
-                                list={[{ title: 'Baia Mare' }, { title: 'Romania' }]}
+                                list={[]}
                             />
                             <CustomAutoComplete
                                 id={'type'}
