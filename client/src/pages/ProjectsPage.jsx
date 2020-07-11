@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ProjectComponent } from '../modules/projects/ProjectComponent'
+import { ProjectsContainer } from '../modules/projects/ProjectsContainer'
 import MainLayout from '../modules/MainLayout'
 
-export const ProjectPage = (props) => <MainLayout renderContent={<ProjectComponent />} {...props} />
+export const ProjectsPage = (props) => <MainLayout renderContent={<ProjectsContainer />} {...props} />

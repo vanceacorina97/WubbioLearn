@@ -6,6 +6,7 @@ import InputBase from '@material-ui/core/InputBase';
 import PhotoService from '../modules/photos/PhotoService';
 import { store } from '../store/store';
 
+
 const useStyles = makeStyles((theme) => ({
     search: {
         position: 'relative',
@@ -49,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 const CustomSearch = () => {
     const classes = useStyles();
     const theme = useTheme();
+    
 
     const [inputSearch, setInputSerach] = useState('');
     const [search, setSerach] = useState('');
@@ -57,14 +59,12 @@ const CustomSearch = () => {
     const { dispatch } = globalState;
 
     const getSearchPhoto = async (value) => {
+   
         try {
             dispatch({ type: 'photos-list-start' });
-            console.log('search din customsearch', value)
             const response = await PhotoService.getAllPhotos({ search: value });
             dispatch({ type: 'photos-list-success', payload: response });
-            console.log('ajunge dupa dispatch success');
         } catch (err) {
-            console.log('ajunge dupa dispatch err');
             dispatch({ type: 'photos-list-error', payload: err });
         }
 

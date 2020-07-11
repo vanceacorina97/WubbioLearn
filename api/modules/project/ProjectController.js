@@ -1,20 +1,32 @@
 const ProjectService = require("../project/ProjectService");
-
 class ProjectController {
 
-    async createProject(req, res) {
-        const idUser = req.user.id;
-        const projectName = req.body.name;
-        const description = req.body.description;
+    async createProject(req, res, next) {
         const status = 'proposed';
-        const result = await ProjectService.createProject(idUser, projectName, description, status);
-        return res.status(200).send(result);
-
+        const { name, description, location, area, type, environement } = req.body;
+        const projectID = await ProjectService.createProject(
+            req.user.id,
+            name,
+            description,
+            location,
+            area,
+            type,
+            environement,
+            status);
+        req.projectId = projectID;
+        next();
     }
 
     async getAllProjects(req, res) {
         const projects = await ProjectService.getAllProjects();
         return res.send(projects);
+    }
+
+    async getProject(req, res, next) {
+        let idProject =  req.query.idProject;
+        const detailsProject = await ProjectService.getProject(idProject); 
+        req.detailsProject = detailsProject;
+        next();
     }
 
 }

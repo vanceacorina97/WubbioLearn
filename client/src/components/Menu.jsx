@@ -6,13 +6,22 @@ import PermMediaOutlinedIcon from '@material-ui/icons/PermMediaOutlined';
 import CreateNewFolderOutlinedIcon from '@material-ui/icons/CreateNewFolderOutlined';
 import { Drawer, List, Divider, IconButton, ListItem, ListItemIcon, ListItemText, Link } from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeftRounded';
+import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
+import JwtDecode from 'jwt-decode';
 
-const menuItems = [{ 'id': 'project', 'name': 'Project', 'icon': <FolderSpecialOutlinedIcon />, 'href': '/projects' },
-{ 'id': 'photos', 'name': 'Photos', 'icon': <PermMediaOutlinedIcon />, 'href': '/photos' },
-{ 'id': 'space', 'icon': <Divider key='space' /> },
-{ 'id': 'addproject', 'name': 'Add Project', 'icon': <CreateNewFolderOutlinedIcon />, 'href': '/add/project' }];
-
-const drawerWidth = 240; // facut fisier de constante si adaugat acolo
+const drawerWidth = 240;
+const handleSetMenuItem = () => {
+    const token = JwtDecode(localStorage.getItem('token'));
+    const menuItems = [{ 'id': 'project', 'name': 'Projects', 'icon': <FolderSpecialOutlinedIcon />, 'href': '/projects' },
+    { 'id': 'photos', 'name': 'Photos', 'icon': <PermMediaOutlinedIcon />, 'href': '/photos' },
+    { 'id': 'space', 'icon': <Divider key='space' /> },
+    { 'id': 'addproject', 'name': 'Add Project', 'icon': <CreateNewFolderOutlinedIcon />, 'href': '/add/project' },
+    ];
+    if (token.data.type === 'admin') {
+        menuItems.push({ 'id': 'register', 'name': 'Add User', 'icon': <PersonAddOutlinedIcon />, 'href': '/register' });
+    }
+    return menuItems;
+}
 const useStyles = makeStyles((theme) => ({
     drawer: {
         width: drawerWidth,
@@ -42,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         justifyContent: 'flex-end',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
     link: {
@@ -80,15 +88,16 @@ const Menu = ({ open, handleDrawerClose }) => {
             </div>
             <Divider />
             <List>
-                {menuItems.map((menuItem) => (
-                    menuItem.id === 'space' ? (menuItem.icon) : (
-                        <Link className={classes.link} href={menuItem.href} key={menuItem.id}>
-                            <ListItem button >
-                                <ListItemIcon>{menuItem.icon}</ListItemIcon>
-                                <ListItemText primary={menuItem.name} />
-                            </ListItem>
-                        </Link>)
-                ))}
+                {
+                    handleSetMenuItem().map((menuItem) => (
+                        menuItem.id === 'space' ? (menuItem.icon) : (
+                            <Link className={classes.link} href={menuItem.href} key={menuItem.id}>
+                                <ListItem button >
+                                    <ListItemIcon>{menuItem.icon}</ListItemIcon>
+                                    <ListItemText primary={menuItem.name} />
+                                </ListItem>
+                            </Link>)
+                    ))}
             </List>
         </Drawer>
     )

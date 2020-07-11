@@ -8,7 +8,7 @@ dotenv.config();
 
 const getJWTStrategy = () => {
     return new JWTStrategy({
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(), // de facut research
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.JWT_SECRET
     },
         function (token, done) {

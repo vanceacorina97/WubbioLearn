@@ -3,17 +3,18 @@ const neo4jConfig = require('../../config');
 class Service {
     session = neo4jConfig.config();
 
-    async register(name, email, password) {
+    async register(name, email, password, type, idUser) {
         let userDetails = new Array();
         const result = await this.session
-            .run(`CREATE (u:User{name:'${name}', email:'${email}', password:'${password}'}) return u`)
+            .run(`MATCH (n:User) where ID(n) = ${idUser} CREATE (u:User{name:'${name}', email:'${email}', password:'${password}', type:'${type}'})<-[:REGISTERED]-(n) return u`)
             .then(function (result) {
                 result.records.forEach(function (record) {
                     userDetails.push({
                         id: record._fields[0].identity.low,
                         name: record._fields[0].properties.name,
                         email: record._fields[0].properties.email,
-                        password: record._fields[0].properties.password
+                        password: record._fields[0].properties.password,
+                        type: record._fields[0].properties.type
                     });
                 });
                 return userDetails;
@@ -34,7 +35,8 @@ class Service {
                         id: record._fields[0].identity.low,
                         name: record._fields[0].properties.name,
                         email: record._fields[0].properties.email,
-                        password: record._fields[0].properties.password
+                        password: record._fields[0].properties.password,
+                        type: record._fields[0].properties.type
                     });
                 });
                 if (userDetail.length === 0) {
@@ -59,6 +61,7 @@ class Service {
                         id: record._fields[0].identity.low,
                         name: record._fields[0].properties.name,
                         email: record._fields[0].properties.email,
+                        type: record._fields[0].properties.type
                     });
                 });
                 if (userDetail.length === 0) {
@@ -82,6 +85,7 @@ class Service {
                         id: record._fields[0].identity.low,
                         name: record._fields[0].properties.name,
                         email: record._fields[0].properties.email,
+                        type: record._fields[0].properties.type
                     });
                 });
                 if (allUsers.length === 0) {

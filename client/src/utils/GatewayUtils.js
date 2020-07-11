@@ -2,6 +2,7 @@ import axios from 'axios';
 import config from '../config';
 
 const CONTENT_TYPE = 'application/json';
+const CONTENT_TYPE_UPLOAD = 'multipart/form-data';
 const GET_METHOD = 'GET';
 const POST_METHOD = 'POST';
 
@@ -13,13 +14,19 @@ export default class Gateway {
     get baseUrl() {
 
         const backendUrl = `${this.config.BACKEND_PROTOCOL}${this.config.BACKEND_HOSTNAME}:${this.config.BACKEND_PORT}`
-        //  console.log('baseUrl-------- ',  `${backendUrl}`);
         return `${backendUrl}`;
     }
 
     get headers() {
         return {
             'Content-Type': CONTENT_TYPE,
+            'Authorization': `bearer ${localStorage.getItem('token')}`,
+        };
+    }
+
+    get headersImage() {
+        return {
+            'Content-Type': CONTENT_TYPE_UPLOAD,
             'Authorization': `bearer ${localStorage.getItem('token')}`,
         };
     }
@@ -31,8 +38,15 @@ export default class Gateway {
         });
     }
 
+    
+    get clientImage() {
+        return axios.create({
+            baseURL: this.baseUrl,
+            headers: this.headersImage,
+        });
+    }
+
     postRequest(url, data) {
-        // console.log('url', url)
         const options = this.getRequestOptions(POST_METHOD, url, data);
 
         return this.client(options)
@@ -40,9 +54,16 @@ export default class Gateway {
             .catch(this.onError);
     }
 
+    postImageRequest(url, data) {
+        const options = this.getRequestOptions(POST_METHOD, url, data);
+
+        return this.clientImage(options)
+            .then(this.onSuccess)
+            .catch(this.onError);
+    }
+
     getRequest(url, data) {
         const options = this.getRequestOptions(GET_METHOD, url, data);
-        console.log('options', options)
 
 
         return this.client(options)
@@ -63,7 +84,12 @@ export default class Gateway {
 
         options.method = method;
         options.url = `${endpoint}`;
-        options.params = data; //  options.data = data;
+        if (method === GET_METHOD) {
+            options.params = data;
+        } else {
+            options.data = data;
+        }
+
 
         return options;
     }

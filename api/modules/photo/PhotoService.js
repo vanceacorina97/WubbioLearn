@@ -1,5 +1,6 @@
 const neo4jConfig = require('../../config');
 const PhotoHelper = require("../photo/PhotoHelper");
+const { session } = require('neo4j-driver');
 class Service {
 
     session = neo4jConfig.config();
@@ -8,7 +9,7 @@ class Service {
         let allPhotos = new Array();
         let query = "MATCH (p:Photo) RETURN p";
         if (search) {
-            query = `MATCH (p:Photo),(m:Metadata) where m.name CONTAINS '${search}' and (p) - [:CONTAIN] -> (m) return p`;
+            query = `MATCH (p:Photo),(m:Metadata) where m.name CONTAINS '${search}' and (p) - [:CONTAIN] -> (m) return distinct p`;
         }
         const result = await this.session
             .run(query)
@@ -30,17 +31,18 @@ class Service {
         return result;
     }
 
-    // aici de facut
     async getAllPhotosFromProject(idProject) {
         let allPhotosFP = new Array();
         const result = await this.session
-            .run("MATCH (p:Photo) <- [:HAS] - (pr:Project) where ID(pr) = <id_project> return p")
+            .run(`MATCH (p:Photo) <- [:HAS] - (pr:Project) where ID(pr) = ${idProject} return p`)
             .then(function (result) {
                 result.records.forEach(function (record) {
                     allPhotosFP.push({
                         id: record._fields[0].identity.low,
                         originalName: record._fields[0].properties.originalName,
-                        path: record._fields[0].properties.path
+                        path: record._fields[0].properties.path,
+                        width: record._fields[0].properties.width,
+                        height: record._fields[0].properties.height
                     });
                 });
                 return allPhotosFP;
@@ -71,106 +73,73 @@ class Service {
             })
     }
 
-    async uploadPhoto(photoData) {
-        let uploadPhoto = new Array();
-        const props = await PhotoHelper.createProps(photoData);
-        const query = `MATCH (u:User) WITH u MATCH (p:Project) WHERE ID(u)=49 and ID(p)=0 CREATE (ph:Photo${props}) <- [:ADDS] - (u),(p) - [:HAS] -> (ph) return ph`;
-        return this.session
-            .run(query)
-            .then(function (result) {
-                result.records.forEach(function (record) {
-                    uploadPhoto.push({
-                        id: record._fields[0].identity.low,
-                        originalName: record._fields[0].properties.originalName,
-                        path: record._fields[0].properties.path
-                    });
-                });
-                return uploadPhoto;
-            })
-            .catch(function (err) {
-                throw err;
-            })
+
+    async uploadAllMetadata(metadate) {
+        const newMetadata = metadate[1].newData;
+        const query = this.createQuery(newMetadata);
+        return this.session.run(query);
     }
 
+    uploadPhoto(photoData, idUser, idProject) {
+        const session = neo4jConfig.config();
+        const props = PhotoHelper.createProps(photoData);
+        const query = `MATCH (u:User) WITH u MATCH (p:Project) WHERE ID(u)=${idUser} and ID(p)=${idProject} CREATE (ph:Photo${props}) <- [:ADDS] - (u),(p) - [:HAS] -> (ph) return ph`;
+        return session.writeTransaction((transaction) => {
+            transaction.run(query);
+        });
+    }
 
-    async uploadMetadataTo(filename, metadate) {
-        // filename - numele fisierului
-        // metadate[0] = oldMetadata care e un array
-        // metadata[1] = newMetadata care e un array
-        let result = false;
-        const oldMetadata = metadate[0].oldData;
-        const newMetadata = metadate[1].newData;
-        if (oldMetadata.length >= 1) {
-            result = await this.uploadMetadata(oldMetadata, 0, filename);
+    createQuery(metadate) {
+        let query = 'CREATE ';
+        let size = metadate.length;
+        metadate.forEach((metadata, index) => {
+            index !== size - 1 ? query += `(:Metadata{name:'${metadata}'}), ` : query += `(:Metadata{name:'${metadata}'})`;
+        })
+        return query;
+    }
+
+    async uploadMetadataTo(file, metadate) {
+        let query = '';
+        if (metadate.length) {
+            const session = neo4jConfig.config();
+            let metadatas = '[ ';
+            metadate.forEach((metadata, index) => {
+                index !== metadate.length - 1 ? metadatas += `'${metadata}', ` : metadatas += `'${metadata}'] `;
+            })
+            query = `match (p:Photo), (m:Metadata)  where p.filename='${file.filename}' and m.name IN ${metadatas} create (p) - [:CONTAIN] -> (m);`;
+            return session.run(query);
+        } else {
+            return;
         }
-        if (newMetadata.length >= 1) {
-            result = await this.uploadMetadata(newMetadata, 1, filename);
-        }
+    }
+
+    async deletePhoto(idPhoto) {
+        const result = await this.session
+            .run(`MATCH (p:Photo) WHERE ID(p) = ${idPhoto} OPTIONAL MATCH (p) -[r] -() DELETE r,p `)
+            .then(function (result) {
+                if (result.summary.counters._stats.nodesDeleted)
+                    return true
+                return false;
+            })
+            .catch(function (error) {
+                return error;
+            })
         return result;
     }
 
-    async uploadMetadata(metadata, type, filename) {
-        let query = '';
-        switch (type) {
-            case 0:
-                query = this.getQuery(metadata, type, filename);
-                return this.session
-                    .run(query)
-                    .then(function (result) {
-                        if (result) {
-                            return true;
-                        }
-                        return false;
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    })
-            case 1:
-                query = this.getQuery(metadata, type, filename);
-                return this.session
-                    .run(query)
-                    .then(function (result) {
-                        if (result) {
-                            return true;
-                        }
-                        return false;
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    })
-            default:
-                return false;
-        }
-
-    }
-
-    getQuery(metadata, type, filename) {
-        let query = '';
-        switch (type) {
-            case 0:
-                query = `match (p:Photo) with p match (m:Metadata) where p.filename = '${filename}' and m.name IN [`;
-                for (let index = 0; index < metadata.length; index++) {
-                    if (index === metadata.length - 1) {
-                        query += `'${metadata[index]}'`
-                    } else {
-                        query += `'${metadata[index]}', `
-                    }
-                }
-                query += '] create (m) <- [:CONTAIN] - (p) return *';
-                break;
-            case 1:
-                query = `match (p:Photo{filename:'${filename}'}) create `;
-                for (let index = 0; index < metadata.length; index++) {
-                    if (index === metadata.length - 1) {
-                        query += `(:Metadata{name:'${metadata[index]}'}) <- [:CONTAIN] - (p) `
-                    } else {
-                        query += `(:Metadata{name:'${metadata[index]}'}) <- [:CONTAIN] - (p), `
-                    }
-                }
-                query += 'return p';
-                break;
-        }
-        return query;
+    async getAllMetadatas(){
+        let allMetadatas = new Array();
+        return this.session
+            .run(`match (m:Metadata) return distinct m`)
+            .then(function (result) {
+                result.records.forEach(function (record) {
+                    allMetadatas.push( record._fields[0].properties.name );
+                });
+                return allMetadatas;
+            })
+            .catch(function (error) {
+                throw error;
+            })
     }
 
 }

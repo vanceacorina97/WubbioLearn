@@ -1,15 +1,24 @@
 import LoginService from './LoginService';
-import { history } from '../../utils/history';
 
 const loginService = new LoginService();
+const OK = 200;
+const UNAUTHORIZED = 403
+
 
 export const login = async (params) => {
-    const token = await loginService.login(params);
-    if (token) {
-        localStorage.setItem('token', token.data.token);
-        history.push('/');
+    const isContecting = await loginService.login(params).then((payload) => {
+        const status = payload.status;
+        switch (status) {
+            case UNAUTHORIZED:
+                return { 'status': status, 'message': payload.data.message };
+            case OK:
+                localStorage.setItem('token', payload.data.token);
+                return { 'status': status, 'token': payload.data.token };
+        }
+    }).catch((error) => {
+        Promise.reject(error);
+    });
 
-    }
-
+    return isContecting;
 
 }

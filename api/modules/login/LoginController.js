@@ -22,7 +22,7 @@ class LoginController {
         if (err) {
             next(new ErrorUnauthorized("Unauthorized"));
         }
-        req.user = info; // req.user e user-ul care da click, e logat.
+        req.user = info;
         next();
     })(req, res, next);
 }

@@ -10,6 +10,8 @@ class UserController {
         const name = req.body.name;
         const email = req.body.email;
         const password = req.body.password;
+        const type = req.body.type;
+        const idUser = req.user.id;
         const validateEmail = await UserHelper.validateEmail(email);
         const existEmail = await UserHelper.checkIfEmailExist(email);
         const validatePassword = await UserHelper.validatePassword(password);
@@ -19,8 +21,8 @@ class UserController {
                     const hashPassword = await bcrypt.hash(password, saltRounds).then(function (hash) {
                         return hash;
                     });
-                    const registeredUser = await UserService.register(name, email, hashPassword);
-                    return res.status(200).send(registeredUser);
+                    const registeredUser = await UserService.register(name, email, hashPassword, type, idUser);
+                    return res.status(200).send({ message: "User created successfully!" });
                 } else {
                     res.status(400).json({ error: "Invalid Password!" });
                 }

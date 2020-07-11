@@ -9,7 +9,8 @@ import Menu from '@material-ui/core/Menu';
 import CustomSeach from '../components/CustomSearch'
 import MoreIcon from '@material-ui/icons/MoreVert';
 import LeftMenu from '../components/Menu';
-
+import { history } from '../utils/history';
+import jwtDecode from 'jwt-decode';
 
 const drawerWidth = 240;
 
@@ -102,6 +103,7 @@ export default function MainLayout({ renderContent }) {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -131,6 +133,11 @@ export default function MainLayout({ renderContent }) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const handleLogOut = (event) => {
+    event.preventDefault();
+    localStorage.removeItem('token');
+    history.push('/login');
+  }
 
 
   const menuId = 'primary-search-account-menu';
@@ -144,8 +151,8 @@ export default function MainLayout({ renderContent }) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
+      <MenuItem onClick={handleMenuClose} disabled>{jwtDecode(localStorage.getItem('token')).data.name}</MenuItem>
+      <MenuItem onClick={handleLogOut}>Log out</MenuItem> {/* handleMenuClose */}
     </Menu>
   );
   const mobileMenuId = 'primary-search-account-menu-mobile';

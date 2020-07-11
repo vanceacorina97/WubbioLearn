@@ -7,7 +7,7 @@ class Helper {
     async checkIfEmailExist(email) {
         let exist = false;
         const result = await this.session
-            .run("MATCH (u:User) RETURN u.email = '" + email + "'as exist")
+            .run(`MATCH (u:User{email:'${email}'}) RETURN u.email = '${email}'as exist`)
             .then(function (result) {
                 result.records.forEach(function (record) {
                     exist = record._fields[0];

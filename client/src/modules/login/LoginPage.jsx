@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles'
-import { TextField, InputAdornment, Button, IconButton } from '@material-ui/core/'
+import { Button, IconButton } from '@material-ui/core/'
 import { Visibility, VisibilityOff } from '@material-ui/icons/';
-import CustomTextField from '../../components/CustomTextField'
+import CustomTextField from '../../components/CustomTextField';
+import { history } from '../../utils/history';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,6 +93,8 @@ const LoginPage = ({ login }) => {
   });
   const [emailError, setEmailError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
+  const [emailMessageError, setEmailMessageError] = React.useState('');
+  const [passMessageError, setPassMessageError] = React.useState('');
 
   const handleChange = (prop) => (event) => {
     if (prop === 'email') {
@@ -110,12 +113,14 @@ const LoginPage = ({ login }) => {
   const isEmailValid = (email) => {
     // functia care seteaza daca e email invalid ia trimite true daca da
     setEmailError(validateEmail(email));
+    validateEmail(email) === true ? setEmailMessageError("Invalid email!") : setEmailMessageError("");
     return false;
   }
 
   const isPasswordValid = (password) => {
     // functia care seteaza daca e email invalid ia trimite true daca da
     setPasswordError(validatePassword(password));
+    validatePassword(password) === true ? setPassMessageError("Invalid password!") : setPassMessageError("");
     return false;
   }
 
@@ -139,12 +144,21 @@ const LoginPage = ({ login }) => {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    // props.login(credentials);
     const data = {
       username: credentials.email,
       password: credentials.password
     }
-    login(data);
+    const validateLogin = login(data);
+    validateLogin.then((value) => {
+      switch (value.status) {
+        case 403:
+          setPassMessageError(value.message);
+          setPasswordError(true);
+          break;
+        case 200:
+          history.push('/');
+      }
+    }).catch((error) => { Promise.reject(error) });
   }
   const isFormCompleted = () => credentials.email && credentials.password;
 
@@ -166,7 +180,7 @@ const LoginPage = ({ login }) => {
               value={credentials.email}
               handleChange={handleChange('email')}
               inputClassName={classes.input}
-              helperText={emailError && "Email is not valid!"}
+              helperText={emailError && emailMessageError}
               onBlur={() => isEmailValid(credentials.email)}
             />
             <CustomTextField
@@ -187,7 +201,7 @@ const LoginPage = ({ login }) => {
               > {credentials.showPassword ? <Visibility /> : <VisibilityOff />}
               </IconButton>}
               handleChange={handleChange('password')}
-              helperText={passwordError && "Invalid password!"}
+              helperText={passwordError && passMessageError}
               onBlur={() => isPasswordValid(credentials.password)}
             />
             <Button

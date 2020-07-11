@@ -15,7 +15,7 @@ class Service {
         }
         const token = TokenService.createJWToken({
           sessionData: user,
-          maxAge: 3600
+          maxAge: 3600 * 24
         })
         resolve({ token: token });
       });

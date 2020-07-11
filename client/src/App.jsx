@@ -1,13 +1,19 @@
 import * as React from 'react';
 import { Router, Route, Switch } from 'react-router-dom';
 import { history } from './utils/history';
-import MainLayout from './modules/MainLayout'
 import { LoginContainer } from './modules/login/LoginContainer';
 import PrivateRoute from './components/PrivateRoute'
-import { ProjectPage } from './pages/ProjectsPage'
-import { Test } from './modules/Test'
+import { ProjectsPage } from './pages/ProjectsPage'
+import { TestPage } from './pages/TestPage'
 import { PhotosPage } from './pages/PhotosPage';
 import { AddProjectPage } from './pages/AddProjectPage';
+import { MainPage } from './pages/MainPage';
+import AdminRoute from './components/AdminRoute';
+import '../public/assets/css/style.css' 
+import LoginRoute from './components/LoginRoute';
+import { ProjectPage } from './pages/ProjectPage';
+import { RegisterContainer } from './modules/register/RegisterContainer';
+// import LoginRoute from './components/LoginRoute';
 
 class App extends React.Component {
 
@@ -15,12 +21,14 @@ class App extends React.Component {
     return (
       <Router history={history}>
         <Switch>
-          <Route exact path="/login" component={LoginContainer} />
-          <PrivateRoute exact path="/" component={MainLayout} />
-          <PrivateRoute exact path="/projects" component={ProjectPage} />
+          <LoginRoute exact path="/login" component={LoginContainer} />
+          <AdminRoute exact path="/register" component={RegisterContainer} />
+          <PrivateRoute exact path="/" component={MainPage} />
+          <PrivateRoute exact path="/projects" component={ProjectsPage} />
           <PrivateRoute exact path="/photos" component={PhotosPage} />
           <PrivateRoute exact path="/add/project" component={AddProjectPage} />
-          <Route exact path='/test' component={Test} />
+          <PrivateRoute path="/projects/:projectId" component={ProjectPage} />
+          <Route exact path='/test' component={TestPage} />
         </Switch>
       </Router>
     );

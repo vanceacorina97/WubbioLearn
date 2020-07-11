@@ -12,7 +12,7 @@ class LoginService {
                 return data;
             })
             .catch((error) => {
-                Promise.reject(error);
+                return error;
             })
     }
 }
